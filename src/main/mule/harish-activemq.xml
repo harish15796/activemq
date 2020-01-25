@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="harish-activemq-publish-Flow" doc:id="706cdcbe-3a32-4c76-abbc-e15be2921b80" >
+		<http:listener doc:name="Listener" doc:id="499a352c-7697-4ca6-964f-32c36aab4f91" config-ref="HTTP_Listener_config" path="queue"/>
+		<file:read doc:id="ce9df5ca-efe1-4cd8-b165-7bc35ff023fa" path="C:\Users\DELL\Desktop\SalesJan2009.csv" config-ref="File_Config" doc:name="Read-file">
+			<reconnect />
+		</file:read>
+		<jms:publish doc:name="Publish-to-queue" doc:id="15b231f7-5145-42bc-beff-06da41d62603" config-ref="JMS_Config" destination="harish-queue">
+			<reconnect />
+		</jms:publish>
+		<logger level="INFO" doc:name="Logger" doc:id="0a2f9342-21e0-41d0-aedb-a195bf8f2bd7" message="success"/>
+	</flow>
+	<flow name="harish-activemq-consume-Flow" doc:id="cdfd35bc-a519-435a-bc29-e9ab14c734f0" >
+		<jms:listener doc:name="Listener" doc:id="3309a6c8-26e1-46f9-bde8-b77d2ea75c13" config-ref="JMS_Config" destination="harish-queue"/>
+		<ee:transform doc:name="Mapping-by- country-price" doc:id="48e7cac5-ddcd-4bd6-9f5b-0c033eb19464" >
+			<ee:message >
+				<ee:set-payload resource="mapping.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="flow-ends" doc:id="5b61a2fe-bc21-4765-9aba-1d75a646d648" message='"flow ends"- #[payload]'/>
+	</flow>
+</mule>
